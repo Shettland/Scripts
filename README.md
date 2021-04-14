@@ -1,7 +1,7 @@
 # Scripts
 This is a place where all my scripts are saved.
 - R scripts:
-    - -[merge_results_fin.R](#Merge_results_fin.R)
+    - -merge_results_fin.R(#Merge_results_fin.R)
 - Bash scripts:
 
 ## R Scripts 
