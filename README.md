@@ -1,12 +1,12 @@
 # Scripts
 This is a place where all my scripts are saved.
 - R scripts:
-    - [merge_results_fin.R](#Merge_results_fin.R)
+    - [merge_results_fin.R](#Merge_results_finr)
 - Bash scripts:
     - [pipeline.sh](#pipeline.sh)
 ## R Scripts 
 
-### Merge_results_fin.R
+### Merge_results_fin.R 
 
 __*Merge_results_fin.R*__ is a script that starts with a list of samples and a raw table with gene homologues. 
 
