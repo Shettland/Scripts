@@ -2,7 +2,7 @@
 This is a place where R scripts are saved for later
 ## Merge_results_fin.R
 
-** Merge_results_fin.R ** is a script that starts with a list of samples and a raw table with gene homologues. 
+**Merge_results_fin.R** is a script that starts with a list of samples and a raw table with gene homologues. 
 
 **The script does various things:**
 1. Edits the raw **gene_table** to delete redundant information and present a clean table to work with.
