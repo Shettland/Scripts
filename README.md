@@ -33,5 +33,5 @@ bash ./pipeline.sh -p home/Analysis/RNAseq_samples/ -t home/share/trimmomatic/tr
 A script that selects **-n** number of genes from a gene_name table and finds their sequence searching through fasta files in a given directory, printing its length and the sum of total aminoacids of the selected gene-sequences. Its useful to know if your request to other software like secretomeP will surpass the permitted limit or not.
 
 ~~~ 
-bash ./lengther.sh -f path/to/gene_table.file -p path/to/clusters_directory/ -n num -m path/to/pangenome_matrix.file
+bash ./lengther.sh -f path/to/gene_table.file -p path/to/fastas_directory/ -n num -m path/to/pangenome_matrix.file
 ~~~
