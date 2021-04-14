@@ -13,4 +13,4 @@ This is a place where all my scripts are saved.
 3. Merges all the recently made tables and merges all of them into one final_table.
 4. Adds valuable information to the final_table and order to ease its comprehension.
 
-For this task it uses ***for*** loops and ***if*** conditionals to iterate over the data and produce the results automatically.
+For this task it uses ***for*** loops and ***if*** conditionals to iterate over the data, generating the results automatically.
