@@ -23,7 +23,7 @@ For this task it uses ***for*** loops and ***if*** conditionals to iterate over 
 
 ### pipeline.sh
 
-A pipeline to run trimmomatic and trinity over all the paired-end found in given directory or subdirectories.
+A pipeline to run trimmomatic and trinity over all the paired-end samples found in a given directory or subdirectories.
 
 ### lengther.sh
 
