@@ -26,7 +26,7 @@ For this task it uses ***for*** loops and ***if*** conditionals to iterate over 
 A pipeline to run trimmomatic and trinity over all the paired-end samples found in a given directory or subdirectories.
 Example:
 ~~~
-bash ./pipeline.sh -p home/Analysis/RNAseq_samples/ -t home/share/trimmomatic/trimmomatic.jar -a trimmomatic_adapters.file -y home/share/trinity/Trinity
+bash ./pipeline.sh -p home/Analysis/RNAseq_samples/ -t home/share/trimmomatic/trimmomatic.jar -a trimmomatic_adapters.file -y home/share/trinity/Trinity  
 ~~~
 ### lengther.sh
 
