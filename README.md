@@ -3,7 +3,8 @@ This is a place where all my scripts are saved.
 - R scripts:
     - [merge_results_fin.R](#Merge_results_finr)
 - Bash scripts:
-    - [pipeline.sh](#pipeline.sh)
+    - [pipeline.sh](#pipelinesh)
+    - [lengther.sh](#lengthersh)
 ## R Scripts 
 
 ### Merge_results_fin.R 
