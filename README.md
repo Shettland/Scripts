@@ -26,7 +26,7 @@ These are:*
 - ***Alignment:** Using HISAT2 or STAR.*
 - ***Post Processing:***
     - ***Marking and removing duplicates:** Using Preseq and dupRadar.*
-    - ***Generating FPKM tables:** Using Feature counts and Stringtie.*
+    - ***Generating FPKM tables:** Using featureCounts and Stringtie.*
 
 *Later analysis could be plotting (EdgeR or ggplots) and MultiQC for quality analysis.*
 
