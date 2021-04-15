@@ -24,7 +24,7 @@ These are:*
 - ***Quality analysis:** Using FastQC.*
 - ***Trimming:** Using trimmomatic.*
 - ***Alignment:** Using HISAT2 or STAR.*
-- ***Post Processing:*
+- ***Post Processing:***
     - ***Marking and removing duplicates:** Using Preseq and dupRadar.*
     - ***Generating FPKM tables:** Using Feature counts and Stringtie.*
 
