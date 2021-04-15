@@ -25,11 +25,14 @@ For this task it uses ***for*** loops and ***if*** conditionals to iterate over 
 
 ### pipeline.sh
 
-A pipeline to run trimmomatic and trinity over all the paired-end samples (2 *.fastq* files each) found in a given directory or subdirectories.
+A pipeline to run trimmomatic and trinity over all the paired-end samples (2 *.fastq* files each) found in a given directory or subdirectories. Single-end and stranded are not supported, you might need to change the trinity parameters if you wish to use those kind of samples.
 Example:
 ~~~
 bash ./pipeline.sh -p home/Analysis/RNAseq_samples/ -t home/share/trimmomatic/trimmomatic.jar -a trimmomatic_adapters.file -y home/share/trinity/Trinity  
 ~~~
+
+**Warning:** *Trimmomatic and Trinity parameters are predefined to work for a wide variety of species from different reigns. If you wish you can change them directly from the script. Also keep in mind that Trinity's De novo assembly is a high consuming process: it might take 1 hour for ever million reads* 
+
 ### lengther.sh
 
 A script that selects **-n** number of genes from a gene_name table and finds their sequence searching through fasta files in a given directory, printing its length and the sum of total aminoacids of the selected gene-sequences. Its useful to know if your request to other software like secretomeP will surpass the permitted limit or not.
@@ -37,3 +40,5 @@ A script that selects **-n** number of genes from a gene_name table and finds th
 ~~~ 
 bash ./lengther.sh -f path/to/gene_table.file -p path/to/fastas_directory/ -n num -m path/to/pangenome_matrix.file
 ~~~
+
+**Warning:**  *the pathing used in the script is not global, the script might not work if you run it through different locations.*
