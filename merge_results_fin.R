@@ -1,7 +1,6 @@
 library(dplyr)
 library(stringr)
 library(ballgown)
-library(edgeR)
 library(tidyverse)
 library(reshape)
 
