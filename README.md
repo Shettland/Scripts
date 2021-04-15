@@ -13,11 +13,13 @@ __*Merge_results_fin.R*__ is a script that starts with a list of samples and a r
 
 **The script does various things:**
 1. Edits the raw **gene_table** to delete redundant information and present a clean table to work with.
-2. Runs ballgown on all the samples given, creating one new table for each of those results my merging them with the gene_table.
+2. Runs *ballgown* on all the samples given, creating one new table for each of those results my merging them with the gene_table.
 3. Merges all the recently made tables and merges all of them into one final_table.
 4. Adds valuable information to the final_table and order to ease its comprehension.
 
 For this task it uses ***for*** loops and ***if*** conditionals to iterate over the data, generating the results automatically.
+
+**Warning:** *The script doesn't include previous RNAseq analysis which are necessary to generate .ctab files that the script needs to work.*
 
 **Required libraries:** ***tidyverse, ballgown, reshape, stringr***
 
