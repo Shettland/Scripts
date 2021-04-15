@@ -31,7 +31,7 @@ Example:
 bash ./pipeline.sh -p home/Analysis/RNAseq_samples/ -t home/share/trimmomatic/trimmomatic.jar -a trimmomatic_adapters.file -y home/share/trinity/Trinity  
 ~~~
 
-**Warning:** *Trimmomatic and Trinity parameters are predefined to work for a wide variety of species from different reigns. If you wish you can change them directly from the script. Also keep in mind that Trinity's De novo assembly is a high consuming process: it might take 1 hour for ever million reads* 
+**Warning:** *Trimmomatic and Trinity parameters are predefined to work for a wide variety of species from different reigns. If you wish you can change them directly from the script. Also keep in mind that Trinity's De novo assembly is a high consuming process: it might take 1 hour for every million reads* 
 
 ### lengther.sh
 
