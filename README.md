@@ -19,6 +19,8 @@ __*Merge_results_fin.R*__ is a script that starts with a list of samples and a r
 
 For this task it uses ***for*** loops and ***if*** conditionals to iterate over the data, generating the results automatically.
 
+'***Required libraries: tidyverse, ballgown, reshape, stringr***'
+
 ## Bash scripts
 
 ### pipeline.sh
