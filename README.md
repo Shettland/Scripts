@@ -21,12 +21,12 @@ For this task it uses ***for*** loops and ***if*** conditionals to iterate over 
 
 **Warning:** *The script doesn't include previous RNAseq analysis which are necessary to generate .ctab files that the script needs to work.
 These are:*
-- ***Quality analysis:** Using FastQC.
-- ***Trimming:** Using trimmomatic.
-- ***Alignment:** Using HISAT2 or STAR
-- ***Post Processing:
-    - ***Marking and removing duplicates:** Using Preseq and dupRadar
-    - ***Generating FPKM tables:** Using Feature counts and Stringtie
+- ***Quality analysis:** Using FastQC.*
+- ***Trimming:** Using trimmomatic.*
+- ***Alignment:** Using HISAT2 or STAR.*
+- ***Post Processing:*
+    - ***Marking and removing duplicates:** Using Preseq and dupRadar.*
+    - ***Generating FPKM tables:** Using Feature counts and Stringtie.*
 
 *Later analysis could be plotting (EdgeR or ggplots) and MultiQC for quality analysis.*
 
