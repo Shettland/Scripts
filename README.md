@@ -56,7 +56,7 @@ bash ./lengther.sh -f path/to/gene_table.file -p path/to/fastas_directory/ -n nu
 
 ### geth_loop.sh
 
-A script to run **get_homologues** on loop for **multiple samples against a reference**. It creates a whole folder system in the given directory based on a reference folder containing all the fasta files that the user wants to use for get_homologues, then creates a copy of the refference fasta files in each folder and a copy of one of the samples in each directory according to its sample_name. After that, it runs **get_homologues** on each of those folders by **changing working directory temporarily** on background.
+A script to run **get_homologues** on loop for **multiple samples against a reference**. It creates a whole folder enviroment in the given directory based on a reference folder containing all the fasta files that the user wants to use for get_homologues, then creates a copy of the refference fasta files in each folder and a copy of one of the samples in each directory according to its sample_name. After that, it runs **get_homologues** on each of those folders by **changing working directory temporarily** on background.
 
 ***Advantages of this script: It can be executed from any place on the system. It will create everything in the directory of the script executable, no matter the current working directory***
 
