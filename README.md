@@ -19,7 +19,7 @@ __*Merge_results_fin.R*__ is a script that starts with a list of samples and a r
 
 For this task it uses ***for*** loops and ***if*** conditionals to iterate over the data, generating the results automatically.
 
-**Warning:** *The script doesn't include previous RNAseq analysis which are necessary to generate .ctab files that the script needs to work.
+**Warning:** *The script doesn't include previous RNAseq analysis which are necessary to generate the .ctab files that the script needs to work.
 These are:*
 - ***Quality analysis:** Using FastQC.*
 - ***Trimming:** Using trimmomatic.*
@@ -53,3 +53,13 @@ bash ./lengther.sh -f path/to/gene_table.file -p path/to/fastas_directory/ -n nu
 ~~~
 
 **Warning:**  *the pathing used in the script is not global, the script might not work if you run it through different locations.*
+
+### geth_loop.sh
+
+A script to run **get_homologues** on loop for **multiple samples against a reference**. It creates a whole folder system in the given directory based on a reference folder containing all the fasta files that the user wants to use for get_homologues, then creates a copy of the refference fasta files in each folder and a copy of one of the samples in each directory according to its sample_name. After that, it runs **get_homologues** on each of those folders by **changing working directory temporarily** on background.
+
+***Advantages of this script: It can be executed from any place on the system. It will create everything in the directory of the script executable, no matter the current working directory***
+
+### hlfinder.sh
+
+A script to run **once get_homologues is finished**. It serves to delete homologues between the reference species and other nematodes (or similar species) that could lead to a false positive in the serological test of trichinella. For that purpose, it takes a **reference table** given which has the reference homologues. Then, it finds genes from a reference_ID given and creates a new table without the matching genes. 
