@@ -1,56 +1,70 @@
 #!/bin/bash
 
-: '
 helpFunction()
 {
    echo ""
-   echo "How to run script: $0 -p path/to/samples_directory/ -t path/to/trimmomatic.jar -a trimmomatic_adapters.file -y path/to/Trinity"
-   echo -e "\t -p: folder where the samples are located. Also works for samples within subdirectories"
-   echo -e "\t -t: Path to trimmomatic.jar executable"
-   echo -e "\t -a: Adapters file for trimmomatic"
-   echo -e "\t -y: Path to trinity executable"
-   echo -e "\t Paired End samples only. Single end is not supported"
+   echo "How to run script: $0 -p path/to/main_folder -f path/to/geneIDs.file"
+   echo -e "\t -p: Folder where get_homologues was executed so the script can find the _alltaxa_ subfolder with clustered .faa files."
+   echo -e "\t -f: File with the reference IDs to be found, one per line. Example file.txt:"
+   echo -e "\t T01_"
+   echo -e "\t T03_"
+   echo -e "\t T4A_"
+   echo -e "\t ... with this file, $0 will look for matches based on geneIDs T01_* T03_* or T4A_*"
    exit 1 # Exit script after printing help if no parameter is indicated
 }
 
-while getopts "p:a:t:y:" opt
+while getopts "p:f:" opt
 do
    case "$opt" in
         p ) path="$OPTARG" ;;
-        a ) adapter="$OPTARG" ;;
-        t ) trimmomatic="$OPTARG" ;;
-        y ) trinity="$OPTARG" ;;
+        f ) idfile="$OPTARG" ;;
         ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
-
-if [ -z "$path" ] || [ -z "$trimmomatic" ] || [ -z "$adapter" ] || [ -z "$trinity" ]
-then
-   echo "Some or all of the parameters are empty";
-   helpFunction
-fi
-
-'
-
-FOLDER=$1
 
 list=(00-proteins_homologues/schistosomahaematobium_f0_alltaxa_algBDBH_e0_/
 00-proteins_M_homologues/schistosomahaematobium_f0_alltaxa_algOMCL_e0_/
 00-proteins_G_homologues/schistosomahaematobium_f0_alltaxa_algCOG_e0_/)
 
+BLUE='\033[1;34m'
+NC='\033[0m'
+YELLOW='\033[1;33m'
+RED='\033[1;31m'
 
-if [[ -z $FOLDER ]];
+if [ -z "$path" ] || [ -z "$idfile" ]
 then
-echo "directories: ${list[@]}"
-echo "script usage: $0 folder_with_alltaxa_directories"
-echo "works for subdirectories too (maxdepth = 1)"
-else
+   echo -e "${RED} Some or all of the parameters are empty ${NC} \n";
+   echo "directories: example ${list[@]}"
+   helpFunction
+fi
 
-names=(T01_ T03_ T4A_ T4E_ T4C_ T4B_)
+if [[ ! -f $idfile ]] || [[ ! -s $idfile ]];
+then
+	echo -e "${RED} geneID.file given ($idfile) is empty or does not exist ${NC}"
+	exit 1
+fi
+
+if test $(find ${path}* -maxdepth 1 -type d | grep "alltaxa" | wc -l) -eq 0;
+then
+    echo -e "${RED} No /*alltaxa* folders found in main_folder's subdirectories {NC}"
+    exit 1
+fi
+### Another possible way to exit if find doesn't returns 0: [[ ! -z `find ${path}] -maxdepth 1 -type d | grep "alltaxa"` ]] && helpfunction
+
+DIR=$(dirname "$(readlink -f "$0")")
+
+names=()
+readarray -t names < $idfile
+
 folders=()
-
-fold=$(find ${1}* -maxdepth 1 -type d | grep "alltaxa" > tempfold.txt)
+fold=$(find ${path}* -maxdepth 1 -type d | grep "alltaxa" > tempfold.txt)
 readarray -t folders < tempfold.txt
+rm tempfold.txt
+
+if [[ -f $DIR/badgenes.txt ]];
+then
+	rm $DIR/badgenes.txt
+fi
 
 touch badgenes.txt
 
@@ -65,7 +79,7 @@ do
 #gene=$(grep "gene=${names[c]}" $file > badgenes.txt)#
 #sed -n "s|matches found in folder ${FOLDER}|&|p" >> badgenes.txt
 
-			if [[ -f ./badgenes.txt ]];
+			if [[ -f $DIR/badgenes.txt ]];
 			then
 				gene=$(sed -n "/gene=${names[i]}/p" $file >> badgenes.txt)
 			else
@@ -82,21 +96,26 @@ done
 echo -e "\n" >> badgenes.txt
 filter=$(awk '!seen[$3]++' badgenes.txt > badgenf.txt | echo " " >> badgenf.txt) ###removing duplicates based on column 3 (gene=...) and adding last empty column for later process
 
+rm badgenes.txt
+
 ### sed -i "s/.*gene=.*/file found = file &/{p;n;p}" badgenes.txt
 ### sed -i "/gene/ s/^/file-found=${file}/" ###
 ### sed -i "s/.*gene=.*/file-found='"${file}"' &/" badgenes.txt
 
 cutting=$(awk 'NF' badgenf.txt | cut -d " " -f 3 | sed 's/^gene=//' | uniq > tempfile.txt) #echo " " >> tempfile.txt)   ### removing empty lines and substring *gene=* to get a clear geneID.file
-rm badgenes_table.txt
+
+if [[ -f $DIR/badgenes_table.txt ]];
+then
+	rm $DIR/badgenes_table.txt
+fi
+
 touch badgenes_table.txt
 
 ### FINDING MATCHES BETWEEN GENES FROM GENEID-FILE AND REFERENCE TABLE ###
 
 while read line;
 do
-
-finder=$(grep "$line" ult_FPKM_merged_table.txt | cut -f 1-7,25 >> badgenes_table.txt)
-
+	finder=$(grep "$line" ult_FPKM_merged_table.txt | cut -f 1-7,25 >> badgenes_table.txt)
 done < tempfile.txt
 
 sorting=$(sort -t$'\t' -k 8,8 -rg badgenes_table.txt | uniq > badgenes2_table.txt) ### Sorting by 8th column and deleting duplicates
@@ -106,23 +125,20 @@ echo "Number of genes to be filtered (matching) = $badgenes"
 
 rm badgenes_table.txt
 
-
 ### CREATING FILTERED TABLE FROM MATCHING GENES ###
 
 string=""
 
 while read line;
 do
-
-string="$string|$line"
-
+	string="$string|$line"
 done < tempfile.txt
 
 string=${string#?}
 
-goodgenes=$(grep -vE "$string" ult_FPKM_merged_table.txt | cut -f 1-7,25 > goodgen_table.txt) ## grep -E needed so '\|' is not needed
+goodgenes=$(grep -vE "$string" ult_FPKM_merged_table.txt | cut -f 1-7,25 > goodgen_table.txt) ## grep -E needed to escape '\|'
 
-sorting=$(sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq > goodgenes_table.txt) ### Sorting by 8th column and deleting duplicates
+sorting=$(sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq > $DIR/goodgenes_table.txt) ### Sorting by 8th column and deleting duplicates
 headers=$(head -1 ult_FPKM_merged_table.txt | cut -f 1-7,25)
 sed -i "1s/^/${headers}\n/" goodgenes_table.txt
 
@@ -135,8 +151,5 @@ echo " "
 echo "Filtered gene table saved as goodgenes_table.txt"
 echo " "
 echo "Total genes saved: $sum"
-
-
-fi
 
 
