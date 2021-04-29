@@ -144,7 +144,7 @@ done < badgeneids.txt
 
 string=${string#?}
 
-goodgenes=$(head -n +2 $table | grep -vE "$string" | cut -f 1-7,25 > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
+goodgenes=$(tail -n +2 $table | grep -vE "$string" | cut -f 1-7,25 > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
 
 sorting=$(sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq > $DIR/goodgenes_table.txt) ### Sorting by 8th column and deleting duplicates
 headers=$(head -1 $table | cut -f 1-7,25)
