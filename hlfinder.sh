@@ -55,7 +55,7 @@ DIR=$(dirname "$(readlink -f "$0")")
 
 if test $(find $DIR/ -maxdepth 1 -type f | grep "merged_table" | wc -l) -eq 0;
 then
-	echo -e "${RED} No reference gene table found ${NC}"
+	echo -e "${RED} No reference gene table found in $DIR ${NC}"
 	exit 1
 fi
 
@@ -102,7 +102,7 @@ done
 
 
 echo -e "\n" >> badgenes.txt
-filter=$(awk '!seen[$3]++' badgenes.txt > badgenf.txt | echo " " >> badgenf.txt) ###removing duplicates based on column 3 (gene=...) and adding last empty column for later process
+filter=$(awk '!seen[$3]++' badgenes.txt > badgenf.txt | echo " " >> badgenf.txt) ###removing duplicates based on column 3 (gene=...) and adding an empty line for later awk process
 
 rm badgenes.txt
 
@@ -110,7 +110,7 @@ rm badgenes.txt
 ### sed -i "/gene/ s/^/file-found=${file}/" ###
 ### sed -i "s/.*gene=.*/file-found='"${file}"' &/" badgenes.txt
 
-cutting=$(awk 'NF' badgenf.txt | cut -d " " -f 3 | sed 's/^gene=//' | uniq > tempfile.txt) #echo " " >> tempfile.txt)   ### removing empty lines and substring *gene=* to get a clear geneID.file
+cutting=$(awk 'NF' badgenf.txt | cut -d " " -f 3 | sed 's/^gene=//' | uniq > badgeneids.txt)  ### removing empty lines and substring *gene=* to get a clear geneID.file
 
 if [[ -f $DIR/badgenes_table.txt ]];
 then
@@ -124,7 +124,7 @@ touch badgenes_table.txt
 while read line;
 do
 	finder=$(grep "$line" $table | cut -f 1-7,25 >> badgenes_table.txt)
-done < tempfile.txt
+done < badgeneids.txt
 
 sorting=$(sort -t$'\t' -k 8,8 -rg badgenes_table.txt | uniq > badgenes2_table.txt) ### Sorting by 8th column and deleting duplicates
 
@@ -140,7 +140,7 @@ string=""
 while read line;
 do
 	string="$string|$line"
-done < tempfile.txt
+done < badgeneids.txt
 
 string=${string#?}
 
