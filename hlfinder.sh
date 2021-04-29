@@ -55,7 +55,7 @@ DIR=$(dirname "$(readlink -f "$0")")
 
 if test $(find $DIR/ -maxdepth 1 -type f | grep "merged_table" | wc -l) -eq 0;
 then
-	echo -e "${RED} No reference gene table found ${NC}"
+	echo -e "${RED} No reference gene table found in $DIR ${NC}"
 	exit 1
 fi
 
