@@ -3,9 +3,10 @@
 helpFunction()
 {
    echo ""
-   echo "How to run script: $0 -p path/to/main_folder -f path/to/geneIDs.file"
+   echo "How to run script: $0 -p path/to/main_folder -f path/to/geneIDs.file -t /path/to/FPKM_table.tab"
    echo -e "\t -p: Folder where get_homologues was executed so the script can find the *taxa* subfolder with clustered .faa files."
    echo -e "\t -f: File with the reference IDs to be found, one per line. Example file.txt:"
+   echo -e "\t -t: Reference Table with homologues + FPKM"
    echo -e "\t T01_"
    echo -e "\t T03_"
    echo -e "\t T4A_"
@@ -13,11 +14,12 @@ helpFunction()
    exit 1 # Exit script after printing help if no parameter is indicated
 }
 
-while getopts "p:f:" opt
+while getopts "p:f:t:" opt
 do
    case "$opt" in
         p ) path="$OPTARG" ;;
         f ) idfile="$OPTARG" ;;
+	t ) gtable="$OPTARG" ;;
         ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
@@ -31,9 +33,9 @@ NC='\033[0m'
 YELLOW='\033[1;33m'
 RED='\033[1;31m'
 
-if [ -z "$path" ] || [ -z "$idfile" ]
+if [ -z "$path" ] || [ -z "$idfile" ] || [[ -z "$gtable" ]];
 then
-   echo -e "${RED} Some or all of the parameters are empty ${NC} \n";
+   echo -e "${RED} Some or all of the parameters are empty ${NC} \n"
    echo "directories: example ${list[@]}"
    helpFunction
 fi
@@ -53,21 +55,25 @@ fi
 
 DIR=$(dirname "$(readlink -f "$0")")
 
+: '
 if test $(find $DIR/ -maxdepth 1 -type f | grep "merged_table" | wc -l) -eq 0;
 then
 	echo -e "${RED} No reference gene table found in $DIR ${NC}"
 	exit 1
 fi
 
-table=$(find $DIR/ -maxdepth 1 -type f | grep "merged_table")
+'
 
 names=()
 readarray -t names < $idfile
 
+
 folders=()
-folders=$(find ${path}* -maxdepth 1 -type d | grep "taxa_alg" > tempfold.txt)
+folders=$(find ${path}* -maxdepth 2 -type d | grep "taxa_alg" > tempfold.txt)
 readarray -t folders < tempfold.txt
 rm tempfold.txt
+
+
 
 if [[ -f $DIR/badgenes.txt ]];
 then
@@ -90,16 +96,17 @@ do
 			if [[ -f $DIR/badgenes.txt ]];
 			then
 				gene=$(sed -n "/gene=${names[i]}/p" $file >> badgenes.txt)
+				[[ ! -z $gene ]] && loge=$(echo "$gene found in file: $file" >> badgenlocs.log)
 			else
 
 				gene=$(sed -n "/gene=${names[i]}/p" $file >> badgenes.txt)
+				[[ ! -z $gene ]] && loge=$(echo "$gene found in file: $file" >> badgenlocs.log)
 			fi
 
 		done
 	done
 
 done
-
 
 echo -e "\n" >> badgenes.txt
 filter=$(awk '!seen[$3]++' badgenes.txt > badgenf.txt | echo " " >> badgenf.txt) ###removing duplicates based on column 3 (gene=...) and adding an empty line for later awk process
@@ -123,7 +130,7 @@ touch badgenes_table.txt
 
 while read line;
 do
-	finder=$(grep "$line" $table | cut -f 1-7,25 >> badgenes_table.txt)
+	finder=$(grep "$line" $gtable | cut -f 1-7,25 >> badgenes_table.txt)
 done < badgeneids.txt
 
 sorting=$(sort -t$'\t' -k 8,8 -rg badgenes_table.txt | uniq > badgenes2_table.txt) ### Sorting by 8th column and deleting duplicates
@@ -144,10 +151,10 @@ done < badgeneids.txt
 
 string=${string#?}
 
-goodgenes=$(tail -n +2 $table | grep -vE "$string" | cut -f 1-7,25 > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
+goodgenes=$(tail -n +2 $gtable | grep -vE "$string" | cut -f 1-7,25 > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
 
 sorting=$(sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq > $DIR/goodgenes_table.txt) ### Sorting by 8th column and deleting duplicates
-headers=$(head -1 $table | cut -f 1-7,25)
+headers=$(head -1 $gtable | cut -f 1-7,25)
 sed -i "1s/^/${headers}\n/" goodgenes_table.txt
 
 rm goodgen_table.txt
