@@ -127,13 +127,17 @@ fi
 touch badgenes_table.txt
 
 ### FINDING MATCHES BETWEEN GENES FROM GENEID-FILE AND REFERENCE TABLE ###
+colnums=$(head -1 $gtable | tr -s '\t' '\n' | nl -nln | cut -f1 > colfile.txt)
+ballcols=$(head -1 $gtable | tr -s '\t' '\n' | nl -nln |  grep "ballgown" | cut -f1 | tr "\n" "|" | tr -d " ")
+truecols=$(grep -vE ${ballcols%?} colfile.txt | xargs | tr " " ",") 	### Taking every column except those with 'ballgown' on it ###
 
 while read line;
 do
-	finder=$(grep "$line" $gtable | cut -f 1-7,25 >> badgenes_table.txt)
+	finder=$(grep "$line" $gtable | cut -f ${truecols} >> badgenes_table.txt)
 done < badgeneids.txt
 
-sorting=$(sort -t$'\t' -k 8,8 -rg badgenes_table.txt | uniq > badgenes2_table.txt) ### Sorting by 8th column and deleting duplicates
+sorting=$(awk -F '\t' '{print $NF,$0}' badgenes_table.txt | sort -gr | cut -f2- -d' ' |  uniq > badgenes2_table.txt) ### Sorting by 8th column and deleting duplicates
+### sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq ###
 
 badgenes=$(cat badgenes2_table.txt | wc -l)
 echo "Number of genes to be filtered (matching) = $badgenes"
@@ -151,13 +155,16 @@ done < badgeneids.txt
 
 string=${string#?}
 
-goodgenes=$(tail -n +2 $gtable | grep -vE "$string" | cut -f 1-7,25 > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
+goodgenes=$(tail -n +2 $gtable | grep -vE "$string" | cut -f ${truecols} > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
 
-sorting=$(sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq > $DIR/goodgenes_table.txt) ### Sorting by 8th column and deleting duplicates
-headers=$(head -1 $gtable | cut -f 1-7,25)
+sorting=$(awk -F '\t' '{print $NF,$0}' goodgen_table.txt | sort -rg | cut -f2- -d' ' | uniq > $DIR/goodgenes_table.txt) ### Sorting by last column and deleting duplicates
+headers=$(head -1 $gtable | cut -f ${truecols})
 sed -i "1s/^/${headers}\n/" goodgenes_table.txt
 
+### sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq ###
+
 rm goodgen_table.txt
+rm colfile.txt
 
 num=$(cat goodgenes_table.txt | wc -l)
 sum=$(( $num - 1 ))
