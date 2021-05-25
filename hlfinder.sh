@@ -130,6 +130,7 @@ touch badgenes_table.txt
 colnums=$(head -1 $gtable | tr -s '\t' '\n' | nl -nln | cut -f1 > colfile.txt)
 ballcols=$(head -1 $gtable | tr -s '\t' '\n' | nl -nln |  grep "ballgown" | cut -f1 | tr "\n" "|" | tr -d " ")
 truecols=$(grep -vE ${ballcols%?} colfile.txt | xargs | tr " " ",") 	### Taking every column except those with 'ballgown' on it ###
+maxcols=$(head -1 $gtable | tr "\t" "\n" | wc -l)
 
 while read line;
 do
@@ -153,21 +154,57 @@ do
 	string="$string|$line"
 done < badgeneids.txt
 
-string=${string#?}
+goodgenes=$(tail -n +2 $gtable | grep -vE "${string#?}" | cut -f 1-${maxcols} > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
 
-goodgenes=$(tail -n +2 $gtable | grep -vE "$string" | cut -f ${truecols} > goodgen_table.txt) ## grep -E needed to escape '\|' | tail -n +2 to grep from everything but the first line (headers)
+refcol=$(head -1 $gtable | tr "\t" "\n" | nl -nln | cut -f 1 | tr "\n" "\t" | rev | cut -f 2 | rev)
 
 sorting=$(awk -F '\t' '{print $NF,$0}' goodgen_table.txt | sort -rg | cut -f2- -d' ' | uniq > $DIR/goodgenes_table.txt) ### Sorting by last column and deleting duplicates
-headers=$(head -1 $gtable | cut -f ${truecols})
-sed -i "1s/^/${headers}\n/" goodgenes_table.txt
 
-### sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq ###
+###sorting=$(sort -t$'\t' -k$refcol -nr goodgen_table.txt | uniq > $DIR/goodgenes_table.txt)
+headers=$(head -1 $gtable | cut -f 1-${maxcols})
+addhead=$(sed -i "1s/^/${headers}\n/" goodgenes_table.txt)
 
 rm goodgen_table.txt
 rm colfile.txt
 
+
+### sort -t$'\t' -k 8,8 -rg goodgen_table.txt | uniq ###
+
+
 num=$(cat goodgenes_table.txt | wc -l)
 sum=$(( $num - 1 ))
+
+fpkms=$(head -1 $gtable | tr "\t" "\n" | nl -nln | grep "FPKM" | cut -f 1 | tr "\n" "," | xargs | tr -d " " )
+
+count=0;
+total=0;
+
+prep=$(echo "$fpkms" | tr "," " ")
+colarray=($prep)
+
+for col in ${colarray[@]};
+do
+
+        for i in $( awk -v col=$col -F "\t" 'NR>=2 { print $col; }' $gtable )
+        do
+                total=$(echo $total+$i | bc )
+                ((count++))
+        done
+
+        avg=$(echo "scale=6; $total / $count" | bc)
+        meanrow="${meanrow}\t${avg}"
+
+done
+
+avgcols=$(echo "$meanrow" | sed 's/^[[:space:]]*//')
+truenums=$(head -1 $gtable | tr "\t" "\n" | nl -nln | grep -v "FPKM" | wc -l)
+
+for (( i=1 ; i<${truenums} ; i++ ))
+do
+	tabnum="${tabnum}\t-"
+done
+avgwrite=$(echo -e "Averages:${tabnum}${meanrow}"  >> $DIR/goodgenes_table.txt)
+
 
 echo " "
 echo "Filtered gene table saved as goodgenes_table.txt"
