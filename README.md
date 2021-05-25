@@ -5,8 +5,8 @@ This is a place where all my scripts are saved.
 - Bash scripts:
     - [pipeline.sh](#pipelinesh)
     - [lengther.sh](#lengthersh)
-    - [geth_loop.sh](#geth_loop)
-    - [hlfinder.sh](#hlfinder)
+    - [geth_loop.sh](#geth_loopsh)
+    - [hlfinder.sh](#hlfindersh)
 ## R Scripts 
 
 ### Merge_results_fin.R 
